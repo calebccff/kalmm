@@ -1,0 +1,14 @@
+{
+	"authors": [
+		"caleb"
+	],
+	"copyright": "Copyright © 2019, caleb",
+	"dependencies": {
+		"gtk-d": "~>3.9.0",
+		"jsonizer": "~>0.7.6",
+		"vibe-d": "~>0.8.5"
+	},
+	"description": "A minimal D application.",
+	"license": "proprietary",
+	"name": "kalmm"
+}
