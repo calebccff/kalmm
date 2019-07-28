@@ -24,26 +24,52 @@ import gtk.Main;
 import thunderstore : Package;
 import global;
 
+PackageListStore availableList;
+PackageTreeView available;
+
+PackageListStore buildPackageList() {
+    auto al = new PackageListStore();
+    auto iter = al.createIter();
+    foreach(pack; ts.packages) {
+        al.setValue(iter, 0, pack.name);
+        al.setValue(iter, 1, pack.owner);
+        al.setValue(iter, 2, pack.installed);
+        al.setValue(iter, 3, pack.uuid4);
+        al.append(iter);
+    }
+    return al;
+}
+
+void update() {
+    availableList = buildPackageList();
+    available.setModel(availableList);
+}
+
+struct Description {
+    Label title;
+    Label downloads;
+    Label ver;
+    Image icon;
+}
+
 void init(string[] args) {
     Main.init(args);
-    MainWindow win = new MainWindow("Kalmm");
+    win = new MainWindow("Kalmm");
     win.setDefaultSize(1200, 600);
-    win.setBorderWidth(16);
+    win.setBorderWidth(4);
     Grid grid = new Grid();
     grid.setColumnHomogeneous(false);
     grid.setRowHomogeneous(false);
     win.add(grid);
 
-    PackageListStore availableList = new PackageListStore();
-    foreach(pack; ts.packages) {
-        availableList.addPackage(pack.name, pack.owner, pack.installed, pack.uuid4);
-    }
+    availableList = buildPackageList();
 
-    PackageTreeView available = new PackageTreeView(availableList);
+    available = new PackageTreeView(availableList);
 
     auto scrollable_availableList = new ScrolledWindow();
     grid.attach(scrollable_availableList, 0, 0, 2, 7);
     scrollable_availableList.add(available);
+    scrollable_availableList.setBorderWidth(16);
     scrollable_availableList.setMinContentWidth(600);
     scrollable_availableList.setMinContentHeight(500);
     scrollable_availableList.setMaxContentWidth(600);
@@ -57,6 +83,13 @@ void init(string[] args) {
     });
     buttonInstall.setBorderWidth(2);
     grid.attach(buttonInstall, 0, 8, 1, 1);
+
+    Button buttonRemove = new Button("Uninstall", (Button btn) {
+        TreeIter selected = available.getSelectedIter();
+        ts.uninstall(selected.getValueString(3)); //The uuid is not displayed
+    });
+    buttonInstall.setBorderWidth(2);
+    grid.attach(buttonRemove, 0, 9, 1, 1);
 
     CheckButton checkShowInstalled = new CheckButton("Show installed", (CheckButton btn) {
         if(btn.getActive()){
@@ -81,9 +114,14 @@ void init(string[] args) {
         ts.exportInstalled();
     });
     grid.attach(exportInstalled, 4, 0, 1, 1);
+    Button importMods = new Button("Import Mod List", (Button btn) {
+        ts.importMods();
+    });
+    grid.attach(importMods, 4, 1, 1, 1);
+    grid.attach(new Label("Put your mods list in a file called 'modslist.txt' next to this application"), 3, 2, 2, 1);
 
 
-    
+    ts.checkInstalled();
     win.showAll();
     Main.run();	
 }

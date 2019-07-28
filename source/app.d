@@ -7,7 +7,5 @@ import global;
 void main(string[] args)
 {
 	ts.refreshPackages();
-	ts.checkInstalled();
-
-    window.init(args);
+	window.init(args);    
 }

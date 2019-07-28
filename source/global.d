@@ -3,13 +3,16 @@ module global;
 import std.file;
 import std.json;
 import std.stdio;
+import gtk.MainWindow;
 
 import thunderstore;
+import window;
 
 import jsonizer;
 
 Package[] packages;
 Thunderstore ts;
+MainWindow win;
 
 struct Config {
     mixin JsonizeMe;
