@@ -3,6 +3,7 @@ module thunderstore;
 import std.stdio;
 import std.net.curl;
 import std.path;
+import std.zip;
 
 import std.datetime.date;
 import std.string; //For strings too
@@ -18,6 +19,7 @@ import gtk.Main;
 import gdk.Display;
 
 import global;
+import file_parallel.unzip_parallel;
 
 class Thunderstore {
 
@@ -53,7 +55,13 @@ class Thunderstore {
         //Install the package
         Package pack = packages[packages.map!(pack => pack.uuid4).array.countUntil(uuid)];
         writeln("Downloading: "~pack.name~"-"~pack.versions[0].version_number);
-
+        download(pack.versions[0].download_url, installPath);
+        writeln("Installing...");
+        string packagePath = buildPath(installPath, pack.name~"-"~pack.versions[0].version_number);
+        string zipPath = buildPath(installPath, pack.owner~"-"~pack.name~"-"~pack.versions[0].version_number);
+        mkdir(packagePath);
+        unzipParallel(zipPath, packagePath);
+        remove(zipPath); //Delete the downloaded file
     }
 
     void copyInstalled(){ //Copy the list of installed mods to clipboard
