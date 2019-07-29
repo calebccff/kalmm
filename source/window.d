@@ -16,10 +16,12 @@ import gtk.CellRendererText;
 import gtk.ListStore;
 import gtk.TreeIter;
 import gtk.Button;
+import gtk.Image;
 import gtk.CheckButton;
 import gtk.Grid;
 import gtk.Box;
 import gtk.Main;
+import gtk.Widget;
 
 import thunderstore : Package;
 import global;
@@ -27,10 +29,11 @@ import global;
 PackageListStore availableList;
 PackageTreeView available;
 
-PackageListStore buildPackageList() {
+PackageListStore buildPackageList(Package[] delegate(Package[] packages) packFilter) {
     auto al = new PackageListStore();
     auto iter = al.createIter();
-    foreach(pack; ts.packages) {
+    foreach(pack; packFilter(ts.packages)) {
+        //writeln("Appending pack "~pack.name);
         al.setValue(iter, 0, pack.name);
         al.setValue(iter, 1, pack.owner);
         al.setValue(iter, 2, pack.installed);
@@ -38,6 +41,10 @@ PackageListStore buildPackageList() {
         al.append(iter);
     }
     return al;
+}
+
+PackageListStore buildPackageList() {
+    return buildPackageList((packs) => packs);
 }
 
 void update() {
@@ -50,7 +57,12 @@ struct Description {
     Label downloads;
     Label ver;
     Image icon;
+
+    Widget[] iter() { 
+        return [title, downloads, ver, icon];
+    }
 }
+Description modDesc;
 
 void init(string[] args) {
     Main.init(args);
@@ -58,8 +70,8 @@ void init(string[] args) {
     win.setDefaultSize(1200, 600);
     win.setBorderWidth(4);
     Grid grid = new Grid();
-    grid.setColumnHomogeneous(false);
-    grid.setRowHomogeneous(false);
+    grid.setColumnHomogeneous(true);
+    grid.setRowHomogeneous(true);
     win.add(grid);
 
     availableList = buildPackageList();
@@ -93,12 +105,21 @@ void init(string[] args) {
 
     CheckButton checkShowInstalled = new CheckButton("Show installed", (CheckButton btn) {
         if(btn.getActive()){
-            auto filter = new TreeModelFilter(cast(ListStore)availableList, null);
-            filter.setVisibleFunc(cast(GtkTreeModelFilterVisibleFunc) &filterInstalled, null, null);
-            available.setModel(filter);
+            availableList = buildPackageList((packs) {
+                Package[] filtered;
+                foreach(pack; packs) {
+                    if (pack.installed) {
+                        filtered ~= pack;
+                    }else {
+                        writeln("Skipping "~pack.name);
+                    }
+                }
+                return filtered;
+            });
         }else{
-            available.setModel(availableList);
+            availableList = buildPackageList();
         }
+        available.setModel(availableList);
     });
     grid.attach(checkShowInstalled, 1, 8, 1, 1);
 
@@ -124,15 +145,6 @@ void init(string[] args) {
     ts.checkInstalled();
     win.showAll();
     Main.run();	
-}
-
-static extern(C) int filterInstalled(GtkTreeModel* gtkModel, GtkTreeIter* gtkIter, void* data) //uhhhhhhhhhhhhhhhhhhhhhhh
-{
-    auto model1 = new TreeModel(gtkModel, false);
-    auto it1 = new TreeIter(gtkIter, false);
-
-    bool installed = model1.getValueString(it1, 2) == "TRUE";
-    return installed;
 }
 
 class PackageListStore : ListStore {

@@ -102,6 +102,15 @@ class Thunderstore {
     }
     void uninstall(string uuid) {
         Package pack = packages[packages.map!(pack => pack.uuid4).array.countUntil(uuid)];
+        foreach(dep; pack.versions[0].dependencies) {
+            dep = dep.split("-")[0..$-1].join("-"); //Remove version number, for now we just get the latest version
+            try{
+                Package depen = packages[packages.map!(pack => pack.owner~"-"~pack.name).array.countUntil(dep)];
+                uninstall(depen.uuid4);
+            }catch(RangeError e){
+                writeln("Failed to find dependancy for "~pack.name);
+            }
+        }
         if (!pack.installed) return;
         string packagePath = buildPath(installPath, pack.name~"-"~pack.uuid4);
         packages[packages.map!(pack => pack.uuid4).array.countUntil(uuid)].installed = false;
