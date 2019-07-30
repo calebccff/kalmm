@@ -38,7 +38,7 @@ class Thunderstore {
     }
 
     void refreshPackages() {
-        auto data = parseJSON(get(_url~"api/v1/package"));
+        auto data = parseJSON(get(_url~"api/v1/package", conn));
         packages = data.fromJSON!(Package[]);
     }
 
