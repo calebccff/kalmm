@@ -5,16 +5,17 @@ import std.json;
 import std.stdio;
 import std.net.curl;
 import etc.c.curl : CurlOption;
-import gtk.MainWindow;
+
+import dlangui;
 
 import thunderstore;
-import window;
+import graphics;
 
 import jsonizer;
 
 Package[] packages;
 Thunderstore ts;
-MainWindow win;
+Window window;
 HTTP conn;
 
 struct Config {

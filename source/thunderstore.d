@@ -16,12 +16,8 @@ import std.algorithm;
 import std.net.curl;
 import jsonizer;
 
-import gtk.Clipboard;
-import gdk.Display;
-import gtk.Main;
-
 import global;
-import window;
+import graphics;
 
 class Thunderstore {
 
@@ -55,7 +51,7 @@ class Thunderstore {
                 writeln(e);
             }
         }
-        window.update();
+        //window.update();
     }
 
     void install(string uuid) { //The uid is '<owner>-<name>'
@@ -98,7 +94,7 @@ class Thunderstore {
             }
         }
         packages[packages.map!(pack => pack.uuid4).array.countUntil(uuid)].installed = true;
-        window.update();
+        //window.update();
     }
     void uninstall(string uuid) {
         Package pack = packages[packages.map!(pack => pack.uuid4).array.countUntil(uuid)];
@@ -119,10 +115,10 @@ class Thunderstore {
     }
 
     void copyInstalled(){ //Copy the list of installed mods to clipboard
-        Clipboard clip = Clipboard.getDefault(Display.getDefault());
-        string text = getInstalledList().join("\n");
-        clip.setText(text, -1);
-        writeln("Copied modslist to your clipboard");
+        // Clipboard clip = Clipboard.getDefault(Display.getDefault());
+        // string text = getInstalledList().join("\n");
+        // clip.setText(text, -1);
+        // writeln("Copied modslist to your clipboard");
     }
 
     string[] getInstalledList() {
@@ -136,7 +132,7 @@ class Thunderstore {
     }
 
     void pasteInstalled(){ //Fetch (and install) mods list from clipboard TODO
-        Clipboard clip = Clipboard.getDefault(Display.getDefault());
+        //Clipboard clip = Clipboard.getDefault(Display.getDefault());
         writeln("Currently WIP, paste your mod list to a text file and use the import button");
         //string text = clip.requestText();
         //writeln(text);
@@ -199,5 +195,5 @@ struct Package {
             void date_updated(string str) { _date_updated = DateTime.fromISOExtString(str[0..str.indexOf(".")]); }
         }
         bool installed; //Is this package installed?
-        Description desc;
+        //Description desc;
     }

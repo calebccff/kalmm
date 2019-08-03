@@ -4,13 +4,10 @@
 	],
 	"copyright": "Copyright © 2019, caleb",
 	"dependencies": {
+		"dlangui": "~>0.9.182",
 		"jsonizer": "~>0.7.6"
 	},
-	"lflags": [
-		"-L+gtkd.lib"
-	],
-
-	"description": "A minimal D application.",
-	"license": "proprietary",
+	"description": "A small but powerful Risk of Rain 2 Mod Manager",
+	"license": "GPLv3",
 	"name": "kalmm"
 }

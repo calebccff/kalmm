@@ -1,12 +1,18 @@
 import std.stdio;
 
 import thunderstore;
-import window;
+import graphics;
 import global;
 
-void main(string[] args)
-{
-	writeln("Hello World");
+import dlangui;
+mixin DLANGUI_ENTRY_POINT;
+
+extern (C) int UIAppMain(string[] args) {
 	ts.refreshPackages();
-	window.init(args);    
+
+	init();
+
+	
+
+	return 0;
 }
